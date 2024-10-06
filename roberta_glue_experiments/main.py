@@ -7,16 +7,21 @@ from model_merge import add_model_params
 
 # Parse command-line arguments
 parser = argparse.ArgumentParser(description="Run model merging and evaluation for RoBERTa GLUE experiments.")
-parser.add_argument('--lamb1_values', type=float, nargs='+', required=True, help="Range of lamb1 values to search.")
+parser.add_argument('--lamb1_start', type=float, required=True, help="Start of lamb1 range.")
+parser.add_argument('--lamb1_end', type=float, required=True, help="End of lamb1 range.")
+parser.add_argument('--lamb1_step', type=float, required=True, help="Step size for lamb1 range.")
+parser.add_argument('--lamb2_offset', type=float, required=True, help="Offset value for lamb2 range relative to lamb1.")
+parser.add_argument('--lamb2_step', type=float, required=True, help="Step size for lamb2 range.")
 parser.add_argument('--model1_path', type=str, required=True, help="Path to model 1.")
 parser.add_argument('--model2_path', type=str, required=True, help="Path to model 2.")
+parser.add_argument('--base_model_path', type=str, required=True, help="Path to base model.")
 parser.add_argument('--save_path', type=str, required=True, help="Path to save the merged model.")
 parser.add_argument('--tasks', type=str, nargs='+', required=True, help="Tasks to evaluate.")
 args = parser.parse_args()
 
 # Initialize the tokenizer
-local_model_path = "/path/to/local/model"
-tokenizer = RobertaTokenizer.from_pretrained(local_model_path)
+base_model_path = args.base_model_path
+tokenizer = RobertaTokenizer.from_pretrained(base_model_path)
 
 # Define task-specific model paths and label counts
 task_specific_paths = {
@@ -30,17 +35,17 @@ num_labels = {"cola": 2, "sst2": 2, "mrpc": 2, "rte": 2, "stsb": 1}  # Set label
 print("start")
 
 # Define hyperparameter search range and intervals
-lamb1_values = np.array(args.lamb1_values)  # Lamb1 values from input arguments
+lamb1_values = np.arange(args.lamb1_start, args.lamb1_end, args.lamb1_step)  # Lamb1 values from input arguments
 results = []
 
 model1_path = args.model1_path
 model2_path = args.model2_path
-model3_path = "/path/to/base_model"
+model3_path = args.base_model_path
 save_path = args.save_path
 tasks = args.tasks
 
 for lamb1 in lamb1_values:
-    lamb2_values = np.arange(lamb1 - 0.8, lamb1 + 0.21, 0.05)
+    lamb2_values = np.arange(lamb1 - args.lamb2_offset, lamb1 + args.lamb2_offset + args.lamb2_step, args.lamb2_step)
     for lamb2 in lamb2_values:
         # Merge model parameters
         add_model_params(model1_path, model2_path, model3_path, save_path, lamb1, lamb2)
