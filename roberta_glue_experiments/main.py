@@ -1,8 +1,18 @@
+import argparse
 import numpy as np
 import pandas as pd
 from transformers import RobertaTokenizer
 from evaluation import evaluate_model_on_task
 from model_merge import add_model_params
+
+# Parse command-line arguments
+parser = argparse.ArgumentParser(description="Run model merging and evaluation for RoBERTa GLUE experiments.")
+parser.add_argument('--lamb1_values', type=float, nargs='+', required=True, help="Range of lamb1 values to search.")
+parser.add_argument('--model1_path', type=str, required=True, help="Path to model 1.")
+parser.add_argument('--model2_path', type=str, required=True, help="Path to model 2.")
+parser.add_argument('--save_path', type=str, required=True, help="Path to save the merged model.")
+parser.add_argument('--tasks', type=str, nargs='+', required=True, help="Tasks to evaluate.")
+args = parser.parse_args()
 
 # Initialize the tokenizer
 local_model_path = "/path/to/local/model"
@@ -20,14 +30,14 @@ num_labels = {"cola": 2, "sst2": 2, "mrpc": 2, "rte": 2, "stsb": 1}  # Set label
 print("start")
 
 # Define hyperparameter search range and intervals
-lamb1_values = np.arange(9, 11.51, 0.05)  # Example: from 9 to 11.5 with step size 0.05
+lamb1_values = np.array(args.lamb1_values)  # Lamb1 values from input arguments
 results = []
 
-model1_path = "/path/to/model1"
-model2_path = "/path/to/model2"
+model1_path = args.model1_path
+model2_path = args.model2_path
 model3_path = "/path/to/base_model"
-save_path = "/path/to/save/merged_model"
-tasks = ["cola", "sst2"]
+save_path = args.save_path
+tasks = args.tasks
 
 for lamb1 in lamb1_values:
     lamb2_values = np.arange(lamb1 - 0.8, lamb1 + 0.21, 0.05)
