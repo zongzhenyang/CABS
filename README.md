@@ -26,7 +26,7 @@ To set up the environment, use the provided `environment.yml` file:
 conda env create -f environment.yml
 
 # Activate the environment
-conda activate cabs_experiments_env
+conda activate cabs
 ```
 
 ### Experiments
