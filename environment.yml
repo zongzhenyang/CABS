@@ -1,4 +1,4 @@
-name: eval
+name: CABS
 channels:
   - pytorch
   - nvidia
