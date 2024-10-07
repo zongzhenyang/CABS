@@ -7,13 +7,8 @@ This repository contains the code for the submission "CABS: Conflict-Aware and B
 Model merging based on task vectors, i.e., the parameter differences between fine-tuned models and a shared base model, provides an efficient way to integrate multiple models without retraining. This approach can be used to combine task-specific models into a multitask model, improve generalization, or address model deficiencies. One of the significant challenges faced by model merging is the conflicts between task vectors. Existing works aim to mitigate these conflicts through sparsification; however, two issues observed in our experiments significantly limit their performance: *high parameter overlap* and *unbalanced weight distribution*.
 To address these issues, we propose a simple yet effective framework called **CABS** (Conflict-Aware and Balanced Sparsification), consisting of **Conflict-Aware Sparsification (CA)** and **Balanced Sparsification (BS)**. CA can reduce parameter overlap by applying masks during sequential pruning, ensuring that each task vector retains distinct, non-overlapping parameters. BS leverages $n$ : $m$ pruning to preserve critical weights while maintaining an even distribution across layers. Our comprehensive experiments demonstrate that CABS outperforms state-of-the-art methods across a range of diverse tasks and model sizes. Notably, in experiments with 7B-parameter language models, CABS surpasses the average performance of an "ideal" model, a virtual model that selects the highest score from individual fine-tuned models for each task (CABS: 76.50 vs. Ideal Model: 76.30 vs. Baseline: 76.02 vs. Fine-tuned Model: 75.86). Our results highlight the importance of addressing both high parameter overlap and unbalanced weight distribution to achieve robust and high-performance model merging.
 
-## Overview
+![image](https://github.com/user-attachments/assets/9ef9e2bf-d8b3-4a53-bbfc-6fb00f40dcf8)
 
-The CABS framework involves the following main components:
-
-1. **Extract Task-Specific Vectors**: Extract task-specific information by subtracting the base model parameters from the fine-tuned model parameters.
-2. **Sparsification**: Apply Conflict-Aware and Balanced Sparsification to the extracted task vectors.
-3. **Model Merging and Evaluation**: Merge the pruned task vectors with the base model and evaluate the performance on multiple tasks to understand the resulting improvements.
 
 ## Code
 
