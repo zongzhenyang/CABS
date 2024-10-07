@@ -101,7 +101,7 @@ def sparse_task_vectors(task_vector_model1, task_vector_model2, n=96, m=128):
             if n >= m // 2:
                 param2_remaining = param2 * mask1
                 _, mask_half = nm_pruning(param2_remaining, n=m // 2, m=m, return_mask=True)
-                final_mask2 = torch.clamp(mask2 + mask_half, 0, 1) 
+                final_mask2 = torch.clamp(mask2 + mask_half, 0, 1)
                 param2_pruned = param2 * final_mask2
             else:
                 # Directly apply mask2 to param2 to reduce overlap
@@ -137,11 +137,11 @@ def apply_task_vectors(base_model, task_vector_model):
 
 def main():
     parser = argparse.ArgumentParser(description="Apply task vectors to base model and perform pruning.")
-    parser.add_argument("--base_model_path", type=str, default="/home/LAB/yangzz/models_test/Mistral-7b-v0.1/", help="Path to the base model")
-    parser.add_argument("--task_vector_path1", type=str, default="/home/LAB/yangzz/models_test/WestSeverus-7B-DPO-v2-vector-float16/", help="Path to task vector model 1")
-    parser.add_argument("--task_vector_path2", type=str, default="/home/LAB/yangzz/models_test/WildMarcoroni-Variant1-7B-vector-float16/", help="Path to task vector model 2")
-    parser.add_argument("--save_directory1", type=str, default="/home/LAB/yangzz/models_test/WestSeverus-7B-DPO-v2-model-nm64_256/", help="Path to save pruned model 1")
-    parser.add_argument("--save_directory2", type=str, default="/home/LAB/yangzz/models_test/WildMarcoroni-Variant1-7B-model-nm64_256/", help="Path to save pruned model 2")
+    parser.add_argument("--base_model_path", type=str, default="/path/to/base_model/", help="Path to the base model")
+    parser.add_argument("--task_vector_path1", type=str, default="/path/to/task_vector_model1/", help="Path to task vector model 1")
+    parser.add_argument("--task_vector_path2", type=str, default="/path/to/task_vector_model2/", help="Path to task vector model 2")
+    parser.add_argument("--save_directory1", type=str, default="/path/to/save/pruned_model1/", help="Path to save pruned model 1")
+    parser.add_argument("--save_directory2", type=str, default="/path/to/save/pruned_model2/", help="Path to save pruned model 2")
     parser.add_argument("--n", type=int, default=64, help="Value of n for n:m pruning")
     parser.add_argument("--m", type=int, default=256, help="Value of m for n:m pruning")
     args = parser.parse_args()
@@ -176,4 +176,14 @@ def main():
         print(f"Layer: {layer}, Overlap Ratio: {report['overlap_ratio']:.4f}, Dtype: {report['dtype']}")
 
     # Apply task vectors to base model
-    final_model1 = apply_task_vectors(base_model, task_vector_model1
+    final_model1 = apply_task_vectors(base_model, task_vector_model1)
+    final_model2 = apply_task_vectors(base_model, task_vector_model2)
+    
+    # Save models
+    final_model1.save_pretrained(args.save_directory1)
+    final_model2.save_pretrained(args.save_directory2)
+    print(f"Saved at {args.save_directory1}")
+    print(f"Saved at {args.save_directory2}")
+
+if __name__ == "__main__":
+    main()
