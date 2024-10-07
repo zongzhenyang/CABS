@@ -21,14 +21,49 @@ The experiments involve merging models, pruning model parameters, and evaluating
 
 ## Prerequisites
 
-- Python 3.7 or above
-- PyTorch
-- Hugging Face Transformers library
-- Required Python packages (can be installed using `requirements.txt`)
+To set up the environment, use the provided `environment.yml` file:
+
+```bash
+# Create the environment
+conda env create -f environment.yml
+
+# Activate the environment
+conda activate roberta_glue_experiments
+```
 
 ## Running Experiments
 
-### 1. Model Merging and Evaluation
+### 1. Extract Task-Specific Vector
+
+To extract the task-specific vector from a fine-tuned model, run the `extract_task_vector.py` script with the required arguments:
+
+```bash
+python extract_task_vector.py \
+    --finetuned_model_path /path/to/finetuned_model \
+    --base_model_path /path/to/base_model \
+    --save_path /path/to/save/task_vector
+```
+
+### 2. Sparsification of Task Vectors
+
+To sparsify the extracted task vectors, use the `main.py` script with appropriate arguments to apply different pruning methods. The sparsification step can use magnitude pruning, random pruning, or n:m pruning. Example command:
+
+```bash
+python main.py \
+    --model1_path /path/to/task_vector1 \
+    --model2_path /path/to/task_vector2 \
+    --base_model_path /path/to/base_model \
+    --save_path /path/to/save/pruned_model \
+    --lamb1_start 0.1 \
+    --lamb1_end 1.0 \
+    --lamb1_step 0.1 \
+    --lamb2_lower_offset 0.05 \
+    --lamb2_upper_offset 0.15 \
+    --lamb2_step 0.05 \
+    --tasks cola sst2 mrpc rte
+```
+
+### 3. Model Merging and Evaluation
 
 The main merging and evaluation can be executed using the script `scripts/run_merge_and_evaluate.sh`. Update the paths and hyperparameter values in the script as per your requirement.
 
