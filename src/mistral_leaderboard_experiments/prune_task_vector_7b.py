@@ -73,14 +73,30 @@ def nm_pruning(M, n=64, m=128, return_mask=False):
 
     return pruned_M.view(original_shape)
 
-def sparse_task_vectors(task_vector_model1, task_vector_model2, n=96, m=128):
+def magnitude_pruning(M, sparsity_level=0.5):
     """
-    Apply n:m pruning to task vectors to reduce overlap and maintain target sparsity.
+    Apply magnitude pruning to tensor M based on a given sparsity level.
+    
+    :param M: Input tensor
+    :param sparsity_level: Proportion of elements to prune
+    :return: Pruned tensor
+    """
+    flattened_param = M.flatten()
+    k = int((1 - sparsity_level) * len(flattened_param))
+    threshold = torch.topk(flattened_param.abs(), k, largest=False).values.max()
+    mask = (M.abs() > threshold).float()
+    return M * mask
+
+def sparse_task_vectors(task_vector_model1, task_vector_model2, pruning_method="nm", n=96, m=128, sparsity_level=0.5):
+    """
+    Apply pruning to task vectors to reduce overlap and maintain target sparsity.
     
     :param task_vector_model1: Task vector model 1
     :param task_vector_model2: Task vector model 2
-    :param n: Number of elements to keep in each group for pruning
-    :param m: Total number of elements in each group for pruning
+    :param pruning_method: Pruning method ("nm", "magnitude", "random")
+    :param n: Number of elements to keep in each group for n:m pruning
+    :param m: Total number of elements in each group for n:m pruning
+    :param sparsity_level: Target sparsity level for magnitude or random pruning
     :return: Pruned task vector models 1 and 2
     """
     state_dict1 = task_vector_model1.state_dict()
@@ -91,22 +107,35 @@ def sparse_task_vectors(task_vector_model1, task_vector_model2, n=96, m=128):
             param1 = state_dict1[name].half()  # Ensure float16
             param2 = state_dict2[name].half()  # Ensure float16
 
-            # Apply n:m pruning to param1
-            param1_pruned, mask1 = nm_pruning(param1, n=n, m=m, return_mask=True)
-            
-            # Calculate complementary mask for param2
-            mask2 = 1 - mask1
-            
-            # Check if further pruning is needed based on n and m//2 relationship
-            if n >= m // 2:
-                param2_remaining = param2 * mask1
-                _, mask_half = nm_pruning(param2_remaining, n=m // 2, m=m, return_mask=True)
-                final_mask2 = torch.clamp(mask2 + mask_half, 0, 1)
-                param2_pruned = param2 * final_mask2
+            if pruning_method == "nm":
+                # Apply n:m pruning to param1
+                param1_pruned, mask1 = nm_pruning(param1, n=n, m=m, return_mask=True)
+                
+                # Calculate complementary mask for param2
+                mask2 = 1 - mask1
+                
+                # Check if further pruning is needed based on n and m//2 relationship
+                if n >= m // 2:
+                    param2_remaining = param2 * mask1
+                    _, mask_half = nm_pruning(param2_remaining, n=m // 2, m=m, return_mask=True)
+                    final_mask2 = torch.clamp(mask2 + mask_half, 0, 1)
+                    param2_pruned = param2 * final_mask2
+                else:
+                    # Directly apply mask2 to param2 to reduce overlap
+                    param2_remaining = param2 * mask2
+                    param2_pruned, _ = nm_pruning(param2_remaining, n=n, m=m, return_mask=True)
+            elif pruning_method == "magnitude":
+                # Apply magnitude pruning
+                param1_pruned = magnitude_pruning(param1, sparsity_level)
+                param2_pruned = magnitude_pruning(param2, sparsity_level)
+            elif pruning_method == "random":
+                # Apply random pruning based on sparsity level
+                mask1 = torch.bernoulli(torch.full(param1.shape, 1 - sparsity_level)).float()
+                param1_pruned = param1 * mask1
+                mask2 = torch.bernoulli(torch.full(param2.shape, 1 - sparsity_level)).float()
+                param2_pruned = param2 * mask2
             else:
-                # Directly apply mask2 to param2 to reduce overlap
-                param2_remaining = param2 * mask2
-                param2_pruned, _ = nm_pruning(param2_remaining, n=n, m=m, return_mask=True)
+                raise ValueError(f"Unsupported pruning method: {pruning_method}")
             
             # Update state dictionaries
             state_dict1[name] = param1_pruned.view(state_dict1[name].shape)  # Ensure shape consistency
@@ -142,8 +171,10 @@ def main():
     parser.add_argument("--task_vector_path2", type=str, default="/path/to/task_vector_model2/", help="Path to task vector model 2")
     parser.add_argument("--save_directory1", type=str, default="/path/to/save/pruned_model1/", help="Path to save pruned model 1")
     parser.add_argument("--save_directory2", type=str, default="/path/to/save/pruned_model2/", help="Path to save pruned model 2")
-    parser.add_argument("--n", type=int, default=64, help="Value of n for n:m pruning")
-    parser.add_argument("--m", type=int, default=256, help="Value of m for n:m pruning")
+    parser.add_argument("--pruning_method", type=str, choices=["nm", "magnitude", "random"], default="nm", help="Pruning method to use")
+    parser.add_argument("--n", type=int, default=64, help="Value of n for n:m pruning (required for 'nm' method)")
+    parser.add_argument("--m", type=int, default=256, help="Value of m for n:m pruning (required for 'nm' method)")
+    parser.add_argument("--sparsity_level", type=float, default=0.5, help="Target sparsity level for magnitude or random pruning")
     args = parser.parse_args()
 
     # Load base model
@@ -157,8 +188,10 @@ def main():
     task_vector_model1, task_vector_model2 = sparse_task_vectors(
         task_vector_model1,
         task_vector_model2,
+        pruning_method=args.pruning_method,
         n=args.n,
-        m=args.m
+        m=args.m,
+        sparsity_level=args.sparsity_level
     )
 
     # Check sparsity and overlap
