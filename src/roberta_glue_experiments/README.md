@@ -79,7 +79,7 @@ python main.py \
     --lamb2_lower_offset 0.20 \
     --lamb2_upper_offset 0.20 \
     --lamb2_step 0.1 \
-    --tasks mrpc rte
+    --tasks mrpc+rte
 ```
 
 The main merging and evaluation can also be executed using the script `scripts/run_merge_and_evaluate.sh`. Update the paths and hyperparameter values in the script as per your requirement.
