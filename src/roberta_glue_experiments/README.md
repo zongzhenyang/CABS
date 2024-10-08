@@ -6,7 +6,7 @@ This repository contains the code and scripts for performing model merging, eval
 
 The experiments involve merging models, pruning model parameters, and evaluating their performance on various GLUE tasks. The main steps include:
 
-1. **Extract Task-Specific Vector**: Extract task-specific vectors by subtracting base model parameters from fine-tuned model parameters.
+1. **Extract Task Vector**: Extract task vectors by subtracting base model parameters from fine-tuned model parameters.
 2. **Sparsification of Task Vectors**: Apply different sparsification methods to reduce the size of the extracted task vectors.
 3. **Merging Models and Evaluation**: Merge the pruned task vectors with the base model and evaluate the resulting models on the GLUE benchmark to measure performance metrics.
 
@@ -18,15 +18,15 @@ The experiments involve merging models, pruning model parameters, and evaluating
 - **`model_merge.py`**: Contains functions to merge parameters from multiple models.
 - **`evaluation.py`**: Evaluates merged models on specified GLUE tasks.
 - **`preprocess.py`**: Preprocesses the dataset to prepare it for evaluation.
-- **`extract_task_vector.py`**: Extracts the task-specific vector by subtracting the base model's parameters from the fine-tuned model's parameters.
+- **`extract_task_vector.py`**: Extracts the task vector by subtracting the base model's parameters from the fine-tuned model's parameters.
 - **`prune_task_vector.py`**: Pruning task vectors using various sparsification methods, such as magnitude pruning, random pruning, and n pruning. 
 - **`scripts/run_merge_and_evaluate.sh`**: Bash script to run model merging and evaluation with predefined hyperparameter ranges.
 
 ## Running Experiments
 
-### 1. Extract Task-Specific Vector
+### 1. Extract Task Vector
 
-To extract the task-specific vector from a fine-tuned model, run the `extract_task_vector.py` script with the required arguments:
+To extract the task vector from a fine-tuned model, run the `extract_task_vector.py` script with the required arguments:
 
 ```bash
 python extract_task_vector.py \
