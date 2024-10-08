@@ -19,6 +19,7 @@ The experiments involve merging models, pruning model parameters, and evaluating
 - **`evaluation.py`**: Evaluates merged models on specified GLUE tasks.
 - **`preprocess.py`**: Preprocesses the dataset to prepare it for evaluation.
 - **`extract_task_vector.py`**: Extracts the task-specific vector by subtracting the base model's parameters from the fine-tuned model's parameters.
+- **`prune_task_vector.py`**: Pruning task vectors using various sparsification methods, such as magnitude pruning, random pruning, and n pruning. 
 - **`scripts/run_merge_and_evaluate.sh`**: Bash script to run model merging and evaluation with predefined hyperparameter ranges.
 
 ## Running Experiments
@@ -36,7 +37,7 @@ python extract_task_vector.py \
 
 ### 2. Sparsification of Task Vectors
 
-To sparsify the extracted task vectors, use the `main.py` script with appropriate arguments to apply different pruning methods. The sparsification step can use magnitude pruning, random pruning, or n:m pruning. Example command:
+To sparsify the extracted task vectors, use the `prune_task_vector.py` script with appropriate arguments to apply different pruning methods. The sparsification step can use magnitude pruning, random pruning, or n pruning. Example command:
 
 ```bash
 python prune_task_vector.py \
@@ -48,7 +49,7 @@ python prune_task_vector.py \
     --sparsity_level 0.90625
 ```
 
-For n:m pruning, specify the `n` and `m` values:
+For n pruning, specify the `n` and `m` values:
 
 ```bash
 python prune_task_vector.py \
@@ -61,6 +62,8 @@ python prune_task_vector.py \
     --m 32
 ```
 
+### 3. Model Merging and Evaluation
+
 To merge and evaluate models with different hyperparameter ranges, use the following command:
 
 ```bash
@@ -68,23 +71,18 @@ python main.py \
     --model1_path /path/to/task_vector1 \
     --model2_path /path/to/task_vector2 \
     --base_model_path /path/to/base_model \
-    --save_path /path/to/save/pruned_model \
+    --save_path /path/to/save/merged_model \
+    --excel_path /path/to/save/results \
     --lamb1_start 0.4 \
     --lamb1_end 0.9 \
     --lamb1_step 0.1 \
     --lamb2_lower_offset 0.20 \
     --lamb2_upper_offset 0.20 \
     --lamb2_step 0.1 \
-    --tasks mrpc+rte
+    --tasks mrpc rte
 ```
 
-### 3. Model Merging and Evaluation
-
-The main merging and evaluation can be executed using the script `scripts/run_merge_and_evaluate.sh`. Update the paths and hyperparameter values in the script as per your requirement.
-
-```bash
-bash scripts/run_merge_and_evaluate.sh
-```
+The main merging and evaluation can also be executed using the script `scripts/run_merge_and_evaluate.sh`. Update the paths and hyperparameter values in the script as per your requirement.
 
 ## Hyperparameters
 
@@ -92,13 +90,13 @@ The hyperparameters for model merging and evaluation are controlled by the follo
 
 - **`pruning_method`**: Specifies the pruning method (`magnitude`, `random`, `n:m`).
 - **`sparsity_level`**: Specifies the target sparsity level for magnitude or random pruning.
-- **`n`, `m`**: Parameters for n:m pruning, specifying how many elements to keep (`n`) in each group of size (`m`).
-- **`lamb1_start`, `lamb1_end`, `lamb1_step`**: Control the range for the first merging coefficient (`lamb1`).
-- **`lamb2_lower_offset`, `lamb2_upper_offset`, `lamb2_step`**: Control the range for the second merging coefficient (`lamb2`) relative to `lamb1`.
+- **`n`****\*\*\*\*, \*\*\*\*****`m`**: Parameters for n pruning, specifying how many elements to keep (`n`) in each group of size (`m`).
+- **`lamb1_start`****\*\*\*\*, ********`lamb1_end`********, \*\*\*\*****`lamb1_step`**: Control the range for the first merging coefficient (`lamb1`).
+- **`lamb2_lower_offset`****\*\*\*\*, ********`lamb2_upper_offset`********, \*\*\*\*****`lamb2_step`**: Control the range for the second merging coefficient (`lamb2`) relative to `lamb1`.
 
 ## Results
 
-The results of the model merging and evaluation are saved as an Excel file at the specified path (`RESULTS_PATH`). This file contains the performance metrics for each task, including accuracy and average performance.
+The results of the model merging and evaluation are saved as an Excel file at the specified path (`excel_path`). This file contains the performance metrics for each task, including accuracy and average performance.
 
 ## Notes
 
