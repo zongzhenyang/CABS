@@ -1,21 +1,21 @@
-import torch
+import torch 
 import argparse
 
 
-def topk_values_mask(param, K=0.5, return_mask=False):
-    """Applies top-K pruning to the parameter tensor."""
+def topk_values_mask(param, sparsity_level=0.5, return_mask=False):
+    """Applies top-K pruning to the parameter tensor based on sparsity level."""
     flattened_param = param.flatten()
     sorted_tensor = torch.sort(flattened_param.abs(), descending=False)[0]
-    threshold_index = int(K * len(sorted_tensor))
+    threshold_index = int(sparsity_level * len(sorted_tensor))
     threshold = sorted_tensor[threshold_index]
     mask = (param.abs() > threshold).float()
 
     sparse_param = param * mask
 
     if return_mask:
-        return sparse_param, param, mask
+        return sparse_param, mask
     else:
-        return sparse_param, param
+        return sparse_param
 
 
 def n_m_block_pruning(param, n, m):
@@ -32,10 +32,10 @@ def n_m_block_pruning(param, n, m):
         mask.view(-1)[i:i + m].scatter_(0, topk_indices, 1)
 
     sparse_param = param * mask
-    return sparse_param, param, mask
+    return sparse_param, mask
 
 
-def block_random_pruning(state_dict1, state_dict2, p=0.5, metric='magnitude', n=None, m=None):
+def block_random_pruning(state_dict1, state_dict2, sparsity_level=0.5, pruning_method='magnitude', n=None, m=None):
     """Performs block random pruning on two state dicts."""
     pruned_state_dict1 = {}
     pruned_state_dict2 = {}
@@ -45,21 +45,22 @@ def block_random_pruning(state_dict1, state_dict2, p=0.5, metric='magnitude', n=
             param1 = state_dict1[name]
             param2 = state_dict2[name]
 
-            if metric == 'magnitude':
-                param1, _, mask1 = topk_values_mask(param1, K=p, return_mask=True)
+            if pruning_method == 'magnitude':
+                param1, mask1 = topk_values_mask(param1, sparsity_level=sparsity_level, return_mask=True)
                 param2 *= (1 - mask1)
-                param2, _, mask2 = topk_values_mask(param2, K=p, return_mask=True)
-            elif metric == 'random':
-                mask1 = torch.bernoulli(torch.full(param1.shape, float(p))).float()
-                param2 = param2 * (1 - mask1) 
-                mask2 = torch.bernoulli(torch.full(param2.shape, float(p / (1 - p)))).float()
+                param2, mask2 = topk_values_mask(param2, sparsity_level=sparsity_level, return_mask=True)
+            elif pruning_method == 'random':
+                mask1 = torch.bernoulli(torch.full(param1.shape, 1 - sparsity_level)).float()
+                param1 *= mask1
+                param2 *= (1 - mask1)
+                mask2 = torch.bernoulli(torch.full(param2.shape, 1 - sparsity_level)).float()
                 param2 *= mask2
-                param1 *= mask1 * 1 / (1 - p)
-                param2 *= mask2 * 1 / (1 - p)
-            elif metric == 'n:m' and n is not None and m is not None:
-                param1, _, mask1 = n_m_block_pruning(param1, n=n, m=m)
+            elif pruning_method == 'n:m' and n is not None and m is not None:
+                param1, mask1 = n_m_block_pruning(param1, n=n, m=m)
                 param2 *= (1 - mask1)
-                param2, _, mask2 = n_m_block_pruning(param2, n=n, m=m)
+                param2, mask2 = n_m_block_pruning(param2, n=n, m=m)
+            else:
+                raise ValueError(f"Unsupported pruning method: {pruning_method}")
 
             pruned_state_dict1[name] = param1
             pruned_state_dict2[name] = param2
@@ -69,13 +70,13 @@ def block_random_pruning(state_dict1, state_dict2, p=0.5, metric='magnitude', n=
 
 def main():
     # Parse command-line arguments
-    parser = argparse.ArgumentParser(description="Perform block random pruning on task vectors.")
+    parser = argparse.ArgumentParser(description="Perform block pruning on task vectors.")
     parser.add_argument('--model1_path', type=str, required=True, help="Path to model 1.")
     parser.add_argument('--model2_path', type=str, required=True, help="Path to model 2.")
     parser.add_argument('--save_path1', type=str, required=True, help="Path to save pruned model 1.")
     parser.add_argument('--save_path2', type=str, required=True, help="Path to save pruned model 2.")
-    parser.add_argument('--sparsity', type=float, default=0.5, help="Target sparsity level.")
-    parser.add_argument('--metric', type=str, choices=['magnitude', 'random', 'n:m'], default='magnitude', help="Pruning metric to use.")
+    parser.add_argument('--sparsity_level', type=float, default=0.5, help="Target sparsity level.")
+    parser.add_argument('--pruning_method', type=str, choices=['magnitude', 'random', 'n:m'], default='magnitude', help="Pruning method to use.")
     parser.add_argument('--n', type=int, default=None, help="Value of n for n:m pruning.")
     parser.add_argument('--m', type=int, default=None, help="Value of m for n:m pruning.")
     args = parser.parse_args()
@@ -84,9 +85,9 @@ def main():
     state_dict1 = torch.load(args.model1_path, map_location='cpu')
     state_dict2 = torch.load(args.model2_path, map_location='cpu')
 
-    # Perform block random pruning
+    # Perform block pruning
     pruned_state_dict1, pruned_state_dict2 = block_random_pruning(
-        state_dict1, state_dict2, p=args.sparsity, metric=args.metric, n=args.n, m=args.m
+        state_dict1, state_dict2, sparsity_level=args.sparsity_level, pruning_method=args.pruning_method, n=args.n, m=args.m
     )
 
     # Save pruned models
