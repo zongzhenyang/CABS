@@ -90,9 +90,9 @@ The hyperparameters for model merging and evaluation are controlled by the follo
 
 - **`pruning_method`**: Specifies the pruning method (`magnitude`, `random`, `n:m`).
 - **`sparsity_level`**: Specifies the target sparsity level for magnitude or random pruning.
-- **`n`****\*\*\*\*, \*\*\*\*****`m`**: Parameters for n pruning, specifying how many elements to keep (`n`) in each group of size (`m`).
-- **`lamb1_start`****\*\*\*\*, ********`lamb1_end`********, \*\*\*\*****`lamb1_step`**: Control the range for the first merging coefficient (`lamb1`).
-- **`lamb2_lower_offset`****\*\*\*\*, ********`lamb2_upper_offset`********, \*\*\*\*****`lamb2_step`**: Control the range for the second merging coefficient (`lamb2`) relative to `lamb1`.
+- **`n`**, **`m`**: Parameters for n pruning, specifying how many elements to keep (`n`) in each group of size (`m`).
+- **`lamb1_start`**, **`lamb1_end`**, **`lamb1_step`**: Control the range for the first merging coefficient (`lamb1`).
+- **`lamb2_lower_offset`**, **`lamb2_upper_offset`**, **`lamb2_step`**: Control the range for the second merging coefficient (`lamb2`) relative to `lamb1`.
 
 ## Results
 
