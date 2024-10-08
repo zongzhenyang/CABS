@@ -10,6 +10,8 @@ The experiments involve merging models, pruning model parameters, and evaluating
 2. **Sparsification of Task Vectors**: Apply different sparsification methods to reduce the size of the extracted task vectors.
 3. **Merging Models and Evaluation**: Merge the pruned task vectors with the base model and evaluate the resulting models on the GLUE benchmark to measure performance metrics.
 
+**Models**: For each task, we utilized pre-trained and fine-tuned versions of RoBERTa, obtained from Hugging Face. Specifically, we used [FacebookAI/roberta-base](https://huggingface.co/facebook/roberta-base) as the base model. Fine-tuned models include [textattack/roberta-base-CoLA](https://huggingface.co/textattack/roberta-base-CoLA), [textattack/roberta-base-SST-2](https://huggingface.co/textattack/roberta-base-SST-2), [textattack/roberta-base-MRPC](https://huggingface.co/textattack/roberta-base-MRPC), and [textattack/roberta-base-RTE](https://huggingface.co/textattack/roberta-base-RTE).
+
 ## Files and Scripts
 
 - **`main.py`**: Main script to merge models and evaluate them on GLUE tasks.
@@ -18,18 +20,6 @@ The experiments involve merging models, pruning model parameters, and evaluating
 - **`preprocess.py`**: Preprocesses the dataset to prepare it for evaluation.
 - **`extract_task_vector.py`**: Extracts the task-specific vector by subtracting the base model's parameters from the fine-tuned model's parameters.
 - **`scripts/run_merge_and_evaluate.sh`**: Bash script to run model merging and evaluation with predefined hyperparameter ranges.
-
-## Prerequisites
-
-To set up the environment, use the provided `environment.yml` file:
-
-```bash
-# Create the environment
-conda env create -f environment.yml
-
-# Activate the environment
-conda activate roberta_glue_experiments
-```
 
 ## Running Experiments
 
@@ -52,15 +42,40 @@ To sparsify the extracted task vectors, use the `main.py` script with appropriat
 python main.py \
     --model1_path /path/to/task_vector1 \
     --model2_path /path/to/task_vector2 \
+    --save_path1 /path/to/save/pruned_model1 \
+    --save_path2 /path/to/save/pruned_model2 \
+    --pruning_method magnitude \
+    --sparsity_level 0.5
+```
+
+For n:m pruning, specify the `n` and `m` values:
+
+```bash
+python main.py \
+    --model1_path /path/to/task_vector1 \
+    --model2_path /path/to/task_vector2 \
+    --save_path1 /path/to/save/pruned_model1 \
+    --save_path2 /path/to/save/pruned_model2 \
+    --pruning_method n:m \
+    --n 2 \
+    --m 4
+```
+
+To merge and evaluate models with different hyperparameter ranges, use the following command:
+
+```bash
+python main.py \
+    --model1_path /path/to/task_vector1 \
+    --model2_path /path/to/task_vector2 \
     --base_model_path /path/to/base_model \
     --save_path /path/to/save/pruned_model \
-    --lamb1_start 0.1 \
-    --lamb1_end 1.0 \
+    --lamb1_start 0.4 \
+    --lamb1_end 0.9 \
     --lamb1_step 0.1 \
-    --lamb2_lower_offset 0.05 \
-    --lamb2_upper_offset 0.15 \
-    --lamb2_step 0.05 \
-    --tasks cola sst2 mrpc rte
+    --lamb2_lower_offset 0.20 \
+    --lamb2_upper_offset 0.20 \
+    --lamb2_step 0.1 \
+    --tasks mrpc+rte
 ```
 
 ### 3. Model Merging and Evaluation
@@ -71,28 +86,15 @@ The main merging and evaluation can be executed using the script `scripts/run_me
 bash scripts/run_merge_and_evaluate.sh
 ```
 
-### 2. Extract Task-Specific Vector
-
-To extract the task-specific vector from a fine-tuned model, run the `extract_task_vector.py` script with the required arguments:
-
-```bash
-python extract_task_vector.py \
-    --finetuned_model_path /path/to/finetuned_model \
-    --base_model_path /path/to/base_model \
-    --save_path /path/to/save/task_vector
-```
-
-### 3. Sparsification of Task Vectors
-
-The script `main.py` can be used to sparsify the model parameters after merging. The sparsification step uses various pruning strategies such as magnitude pruning, random pruning, and n:m pruning. The parameters for pruning can be adjusted in the script or through command-line arguments.
-
 ## Hyperparameters
 
 The hyperparameters for model merging and evaluation are controlled by the following arguments:
 
+- **`pruning_method`**: Specifies the pruning method (`magnitude`, `random`, `n:m`).
+- **`sparsity_level`**: Specifies the target sparsity level for magnitude or random pruning.
+- **`n`, `m`**: Parameters for n:m pruning, specifying how many elements to keep (`n`) in each group of size (`m`).
 - **`lamb1_start`, `lamb1_end`, `lamb1_step`**: Control the range for the first merging coefficient (`lamb1`).
 - **`lamb2_lower_offset`, `lamb2_upper_offset`, `lamb2_step`**: Control the range for the second merging coefficient (`lamb2`) relative to `lamb1`.
-- **`sparsity`**: Specifies the target sparsity level for pruning.
 
 ## Results
 
@@ -106,4 +108,3 @@ The results of the model merging and evaluation are saved as an Excel file at th
 ## License
 
 This repository is licensed under the MIT License.
-
