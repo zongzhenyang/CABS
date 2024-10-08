@@ -1,4 +1,3 @@
-
 # 7B Model Experiments Framework
 
 This document describes the framework for conducting experiments on the 7B model using model merging, pruning, and evaluation methodologies. This framework extends similar approaches from the RoBERTa experiments to a larger-scale model.
@@ -44,17 +43,18 @@ python extract_task_vector_7b.py \
 
 ### 2. Sparsification of Task Vectors
 
-Once the task-specific vectors are extracted, apply sparsification to both vectors simultaneously using prune_task_vector_7b.py. Since Mergekit will automatically extract the task vectors during model merging, after sparsifying both task vectors, we will incorporate the base model for merging using Mergekit.
+Once the task-specific vectors are extracted, apply sparsification to both vectors simultaneously using `prune_task_vector_7b.py`.
 
 ```bash
 python prune_task_vector_7b.py \
     --task_vector_path1 /path/to/task_vector_wildmarcoroni \
-    --task_vector_path2 /path/to/task-vector_westseverus \
-    --n 64
-    --m 256
+    --task_vector_path2 /path/to/task_vector_westseverus \
+    --n 64 \
+    --m 256 \
     --pruning_method "nm" \
-    --save_directory /path/to/save/pruned_vector_wildmarcoroni
-    --save_directory /path/to/save/pruned_vector_westseverus
+    --sparsity_level 0.75 \
+    --save_directory1 /path/to/save/pruned_vector_wildmarcoroni \
+    --save_directory2 /path/to/save/pruned_vector_westseverus
 ```
 
 ### 3. Model Merging and Evaluation
@@ -64,14 +64,14 @@ Finally, merge the pruned task vectors with the base model and evaluate them usi
 - **MergeKit Recipe**: Use MergeKit to merge the pruned vectors.
 
 Run MergeKit with the following command:
-```bash
+```
 mergekit-yaml /path/to/recipes/recipe.yml /path/to/save/models/model_name/
 ```
 
 - **LM-Evaluation-Harness**: Use LM-Evaluation-Harness to evaluate the merged model on the specified tasks.
 
 Example command:
-```bash
+```
 lm-evaluation-harness --model hf --model_args pretrained=/path/to/models/model_name --tasks arc_challenge,hellaswag,truthfulqa_mc2,winogrande,gsm8k,mmlu --device cuda:0 --batch_size 8 --output_path results.json
 ```
 
@@ -79,8 +79,10 @@ lm-evaluation-harness --model hf --model_args pretrained=/path/to/models/model_n
 
 The hyperparameters for the 7B model experiments are controlled by the following arguments:
 
-- **sparsity_level**: Defines the target sparsity level for pruning.
-- **pruning_method**: Specifies the pruning method (magnitude, random, n:m).
+- **n**: Number of elements to keep in each group for pruning (required for `nm` pruning).
+- **m**: Total number of elements in each group for pruning (required for `nm` pruning).
+- **sparsity_level**: Defines the target sparsity level for pruning (required for `random` and `magnitude` pruning).
+- **pruning_method**: Specifies the pruning method (`nm`, `random`, `magnitude`).
 
 ## Results
 
@@ -90,6 +92,3 @@ The results of the merging and evaluation step will be saved in a specified outp
 
 - Make sure to update paths to model files, task vectors, and results as required.
 - Adjust hyperparameters to explore their impact on model performance.
-```
-
----
