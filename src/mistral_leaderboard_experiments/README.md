@@ -44,26 +44,17 @@ python extract_task_vector_7b.py \
 
 ### 2. Sparsification of Task Vectors
 
-Once the task-specific vectors are extracted, apply sparsification using `prune_task_vector_7b.py`. This needs to be done for both task vectors.
-
-#### For WildMarcoroni-Variant1-7B:
+Once the task-specific vectors are extracted, apply sparsification to both vectors simultaneously using prune_task_vector_7b.py. Since Mergekit will automatically extract the task vectors during model merging, after sparsifying both task vectors, we will incorporate the base model for merging using Mergekit.
 
 ```bash
 python prune_task_vector_7b.py \
-    --task_vector_path /path/to/save/task_vector_wildmarcoroni \
-    --sparsity_level 0.5 \
-    --pruning_method "magnitude" \
-    --save_path /path/to/save/pruned_vector_wildmarcoroni
-```
-
-#### For WestSeverus-7B-DPO-v2:
-
-```bash
-python prune_task_vector_7b.py \
-    --task_vector_path /path/to/save/task_vector_westseverus \
-    --sparsity_level 0.5 \
-    --pruning_method "magnitude" \
-    --save_path /path/to/save/pruned_vector_westseverus
+    --task_vector_path1 /path/to/task_vector_wildmarcoroni \
+    --task_vector_path2 /path/to/task-vector_westseverus \
+    --n 64
+    --m 256
+    --pruning_method "nm" \
+    --save_directory /path/to/save/pruned_vector_wildmarcoroni
+    --save_directory /path/to/save/pruned_vector_westseverus
 ```
 
 ### 3. Model Merging and Evaluation
@@ -81,7 +72,7 @@ mergekit-yaml /path/to/recipes/recipe.yml /path/to/save/models/model_name/
 
 Example command:
 ```bash
-lm-evaluation-harness --model hf --model_args pretrained=/path/to/models --tasks arc_challenge,hellaswag,winogrande,gsm8k --device cuda:0 --batch_size 8 --output_path results.json
+lm-evaluation-harness --model hf --model_args pretrained=/path/to/models/model_name --tasks arc_challenge,hellaswag,truthfulqa_mc2,winogrande,gsm8k,mmlu --device cuda:0 --batch_size 8 --output_path results.json
 ```
 
 ## Hyperparameters
