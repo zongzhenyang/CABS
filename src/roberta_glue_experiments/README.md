@@ -43,8 +43,8 @@ To sparsify the extracted task vectors, use the `prune_task_vector.py` script wi
 python prune_task_vector.py \
     --model1_path /path/to/task_vector1 \
     --model2_path /path/to/task_vector2 \
-    --save_path1 /path/to/save/pruned_model1 \
-    --save_path2 /path/to/save/pruned_model2 \
+    --save_path1 /path/to/save/pruned_task_vector1 \
+    --save_path2 /path/to/save/pruned_task_vector2 \
     --pruning_method magnitude \
     --sparsity_level 0.90625
 ```
@@ -55,8 +55,8 @@ For n pruning, specify the `n` and `m` values:
 python prune_task_vector.py \
     --model1_path /path/to/task_vector1 \
     --model2_path /path/to/task_vector2 \
-    --save_path1 /path/to/save/pruned_model1 \
-    --save_path2 /path/to/save/pruned_model2 \
+    --save_path1 /path/to/save/pruned_task_vector1 \
+    --save_path2 /path/to/save/pruned_task_vector2 \
     --pruning_method n:m \
     --n 3 \
     --m 32
@@ -68,8 +68,8 @@ To merge and evaluate models with different hyperparameter ranges, use the follo
 
 ```bash
 python main.py \
-    --model1_path /path/to/task_vector1 \
-    --model2_path /path/to/task_vector2 \
+    --model1_path /path/to/pruned_task_vector1 \
+    --model2_path /path/to/pruned_task_vector2 \
     --base_model_path /path/to/base_model \
     --save_path /path/to/save/merged_model \
     --excel_path /path/to/save/results \
