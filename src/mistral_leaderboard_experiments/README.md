@@ -6,22 +6,27 @@ This document describes the framework for conducting experiments on the 7B model
 
 The 7B model experiments are divided into three main steps:
 
-1. **Extract Task-Specific Vector**: Extract task-specific information by subtracting the base model parameters from the fine-tuned model.
+1. **Extract Task-Specific Vector**: Extract task vector by subtracting the base model parameters from the fine-tuned model.
 2. **Sparsification**: Apply various sparsification methods to the extracted task vectors.
 3. **Merging and Evaluation**: Merge the pruned task vectors with the base model and evaluate on specified tasks to understand performance.
 
+## Models
+
+For each task, we utilized pre-trained and fine-tuned versions of the Mistral model, obtained from Hugging Face. Specifically, the decoder-based models used in our evaluations were built upon the [Mistral-7b-v0.1](https://huggingface.co/mistral-7b-v0.1) backbone. Fine-tuned variants used include:
+
+- [WildMarcoroni-Variant1-7B](https://huggingface.co/WildMarcoroni-Variant1-7B)
+- [WestSeverus-7B-DPO-v2](https://huggingface.co/WestSeverus-7B-DPO-v2)
+
 ## Files and Scripts
 
-- **extract_task_vector_7b.py**: Script for extracting task-specific vectors from the fine-tuned 7B model by subtracting base model parameters.
-- **prune_task_vector_7b.py**: Script for applying different sparsification techniques to the task-specific vectors.
-- **merge_and_evaluate_7b.py**: Script for merging the pruned vectors with the base model and evaluating performance.
-- **scripts/run_7b_experiments.sh**: Bash script to run all the steps in sequence with configurable parameters.
+- **extract_task_vector_7b.py**: Script for extracting task vectors from the fine-tuned 7B model by subtracting base model parameters.
+- **prune_task_vector_7b.py**: Script for applying different sparsification techniques to the task vectors.
 
 ## Running Experiments
 
-### 1. Extract Task-Specific Vector
+### 1. Extract Task Vector
 
-To extract task-specific vectors, you will need to run the `extract_task_vector_7b.py` script twice with two different fine-tuned models, but the same base model.
+To extract task vectors, you will need to run the `extract_task_vector_7b.py` script twice with two different fine-tuned models, but the same base model.
 
 #### First Run:
 
@@ -43,7 +48,7 @@ python extract_task_vector_7b.py \
 
 ### 2. Sparsification of Task Vectors
 
-Once the task-specific vectors are extracted, apply sparsification to both vectors simultaneously using `prune_task_vector_7b.py`.
+Once the task vectors are extracted, apply sparsification to both vectors simultaneously using `prune_task_vector_7b.py`.
 
 ```bash
 python prune_task_vector_7b.py \
@@ -92,3 +97,4 @@ The results of the merging and evaluation step will be saved in a specified outp
 
 - Make sure to update paths to model files, task vectors, and results as required.
 - Adjust hyperparameters to explore their impact on model performance.
+
