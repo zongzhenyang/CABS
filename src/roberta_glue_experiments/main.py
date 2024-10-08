@@ -101,6 +101,7 @@ parser.add_argument('--model1_path', type=str, required=True, help="Path to mode
 parser.add_argument('--model2_path', type=str, required=True, help="Path to model 2.")
 parser.add_argument('--base_model_path', type=str, required=True, help="Path to base model.")
 parser.add_argument('--save_path', type=str, required=True, help="Path to save the merged model.")
+parser.add_argument('--excel_path', type=str, required=True, help="Path to save results")
 parser.add_argument('--tasks', type=str, nargs='+', required=True, help="Tasks to evaluate.")
 args = parser.parse_args()
 
@@ -164,7 +165,7 @@ df['model1_path'] = model1_path
 df['model2_path'] = model2_path
 
 # Save DataFrame to Excel file
-excel_path = "/path/to/save/results.xlsx"
+excel_path = args.excel_path
 df.to_excel(excel_path, index=False)
 
 print(f"Results have been saved to {excel_path}")
