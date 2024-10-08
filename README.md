@@ -33,6 +33,6 @@ The repository contains two types of experiments:
 
 1. **RoBERTa GLUE Experiments**: The experiments on RoBERTa are organized under the `src/roberta_glue_experiments` directory. These experiments include extracting task vectors, sparsifying them, merging, and evaluating the merged models on GLUE tasks.
 
-2. **7B Model Experiments with MergeKit**: The experiments on the 7B parameter model are organized under the `src/mistral_leaderboard_experiments` directory. These experiments include using task vectors to perform model merging with MergeKit and evaluating with lm-evaluation-harness.
+2. **MIstral llm_leaderboard Experiments**: The experiments on the 7B parameter model are organized under the `src/mistral_leaderboard_experiments` directory. These experiments include using task vectors to perform model merging with MergeKit and evaluating with lm-evaluation-harness.
 
 Detailed instructions for running the experiments are provided in each respective directory.
