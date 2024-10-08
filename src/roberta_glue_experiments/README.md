@@ -39,26 +39,26 @@ python extract_task_vector.py \
 To sparsify the extracted task vectors, use the `main.py` script with appropriate arguments to apply different pruning methods. The sparsification step can use magnitude pruning, random pruning, or n:m pruning. Example command:
 
 ```bash
-python main.py \
+python prune_task_vector.py \
     --model1_path /path/to/task_vector1 \
     --model2_path /path/to/task_vector2 \
     --save_path1 /path/to/save/pruned_model1 \
     --save_path2 /path/to/save/pruned_model2 \
     --pruning_method magnitude \
-    --sparsity_level 0.5
+    --sparsity_level 0.90625
 ```
 
 For n:m pruning, specify the `n` and `m` values:
 
 ```bash
-python main.py \
+python prune_task_vector.py \
     --model1_path /path/to/task_vector1 \
     --model2_path /path/to/task_vector2 \
     --save_path1 /path/to/save/pruned_model1 \
     --save_path2 /path/to/save/pruned_model2 \
     --pruning_method n:m \
-    --n 2 \
-    --m 4
+    --n 3 \
+    --m 32
 ```
 
 To merge and evaluate models with different hyperparameter ranges, use the following command:
