@@ -1,0 +1,14 @@
+models:
+  - model: /path/to/WildMarcoroni-Variant1-7B-model-west-first-nm64_256/
+    parameters:
+      weight: 1.2
+  - model: /path/to/WestSeverus-7B-DPO-v2-model-west-first-nm64_256/
+    parameters:
+      weight: 1.2
+      
+merge_method: ties
+base_model:  /home/LAB/yangzz/models_test/Mistral-7b-v0.1
+parameters:
+  normalize: false
+  int8_mask: true
+dtype: float16
