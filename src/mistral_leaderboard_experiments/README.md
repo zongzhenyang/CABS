@@ -1,26 +1,27 @@
 # 7B Model Experiments Framework
 
-This document describes the framework for conducting experiments on the 7B model using model merging, pruning, and evaluation methodologies. This framework extends similar approaches from the RoBERTa experiments to a larger-scale model.
+This document describes the framework for conducting experiments on the 7B model using model pruning, merging, and evaluation methodologies. This framework extends similar approaches from the RoBERTa experiments to a larger-scale model
 
 ## Overview
 
 The 7B model experiments are divided into three main steps:
 
-1. **Extract Task-Specific Vector**: Extract task vector by subtracting the base model parameters from the fine-tuned model.
+1. **Extract Task Vector**: Extract task vector by subtracting the base model parameters from the fine-tuned model.
 2. **Sparsification**: Apply various sparsification methods to the extracted task vectors.
-3. **Merging and Evaluation**: Merge the pruned task vectors with the base model and evaluate on specified tasks to understand performance.
+3. **Merging and Evaluation**: Merge the pruned task vectors with the base model and evaluate on tasks.
 
 ## Models
 
-For each task, we utilized pre-trained and fine-tuned versions of the Mistral model, obtained from Hugging Face. Specifically, the decoder-based models used in our evaluations were built upon the [Mistral-7b-v0.1](https://huggingface.co/mistral-7b-v0.1) backbone. Fine-tuned variants used include:
+we utilized pre-trained and fine-tuned versions of the Mistral model, obtained from Hugging Face. Specifically, the models used in our experiments were built upon the [Mistral-7b-v0.1](https://huggingface.co/mistral-7b-v0.1) backbone. Fine-tuned variants used include:
 
 - [WildMarcoroni-Variant1-7B](https://huggingface.co/WildMarcoroni-Variant1-7B)
 - [WestSeverus-7B-DPO-v2](https://huggingface.co/WestSeverus-7B-DPO-v2)
 
 ## Files and Scripts
 
-- **extract_task_vector_7b.py**: Script for extracting task vectors from the fine-tuned 7B model by subtracting base model parameters.
-- **prune_task_vector_7b.py**: Script for applying different sparsification techniques to the task vectors.
+- **extract_task_vector_7b.py**: Code for extracting task vectors from the fine-tuned models by subtracting base model parameters.
+- **prune_task_vector_7b.py**: Code for applying different sparsification methods to the task vectors.
+- **/recipes**：recipes for merging models using Mergekit.
 
 ## Running Experiments
 
@@ -57,20 +58,19 @@ python prune_task_vector_7b.py \
     --n 64 \
     --m 256 \
     --pruning_method "nm" \
-    --sparsity_level 0.75 \
     --save_directory1 /path/to/save/pruned_vector_wildmarcoroni \
     --save_directory2 /path/to/save/pruned_vector_westseverus
 ```
 
 ### 3. Model Merging and Evaluation
 
-Finally, merge the pruned task vectors with the base model and evaluate them using the provided recipes for MergeKit and LM-Harness-Evaluation.
+Finally, merge the pruned task vectors with the base model and evaluate them using the provided recipes for MergeKit and then evaluate the merged model using lm-evaluation-harness.
 
 - **MergeKit Recipe**: Use MergeKit to merge the pruned vectors.
 
 Run MergeKit with the following command:
 ```
-mergekit-yaml /path/to/recipes/recipe.yml /path/to/save/models/model_name/
+mergekit-yaml /src/mistrial_leaderboard_experiments/recipes/recipe.yml /path/to/save/models/model_name/
 ```
 
 - **LM-Evaluation-Harness**: Use LM-Evaluation-Harness to evaluate the merged model on the specified tasks.
@@ -91,7 +91,7 @@ The hyperparameters for the 7B model experiments are controlled by the following
 
 ## Results
 
-The results of the merging and evaluation step will be saved in a specified output file, containing metrics such as accuracy and task-specific performance.
+The results of the merging and evaluation step will be saved in **results.json**, containing metrics such as accuracy and task-specific performance.
 
 ## Notes
 
