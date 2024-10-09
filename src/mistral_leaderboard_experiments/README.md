@@ -6,9 +6,10 @@ This document describes the framework for conducting experiments on the 7B model
 
 The 7B model experiments are divided into three main steps:
 
-1. **Extract Task Vector**: Extract task vector by subtracting the base model parameters from the fine-tuned model.
-2. **Sparsification**: Apply various sparsification methods to the extracted task vectors.
-3. **Merging and Evaluation**: Merge the pruned task vectors with the base model and evaluate on tasks.
+1. **Convert dtype**: convert the dtype of base model to float16 for avoiding error caused by dtype inconsistency.
+2. **Extract Task Vector**: Extract task vector by subtracting the base model parameters from the fine-tuned model.
+3. **Sparsification**: Apply various sparsification methods to the extracted task vectors.
+4. **Merging and Evaluation**: Merge the pruned task vectors with the base model and evaluate on tasks.
 
 ## Models
 
@@ -19,13 +20,22 @@ we utilized pre-trained and fine-tuned versions of the Mistral model, obtained f
 
 ## Files and Scripts
 
+- **convert_dtype.py**: Code  for convert model dtype
 - **extract_task_vector_7b.py**: Code for extracting task vectors from the fine-tuned models by subtracting base model parameters.
 - **prune_task_vector_7b.py**: Code for applying different sparsification methods to the task vectors.
 - **/recipes**：recipes for merging models using Mergekit.
 
 ## Running Experiments
 
-### 1. Extract Task Vector
+### 1. Convert dtype
+
+convert the dtype of base model to float16 for avoiding error caused by dtype inconsistency.
+
+```bash
+python convert_dtype.py
+```
+
+### 2. Extract Task Vector
 
 To extract task vectors, you will need to run the `extract_task_vector_7b.py` script twice with two different fine-tuned models, but the same base model.
 
@@ -33,8 +43,8 @@ To extract task vectors, you will need to run the `extract_task_vector_7b.py` sc
 
 ```bash
 python extract_task_vector_7b.py \
-    --finetuned_model_path BarryFutureman/WildMarcoroni-Variant1-7B \
-    --base_model_path Mistral-7b-v0.1 \
+    --finetuned_model_path path/to/BarryFutureman/WildMarcoroni-Variant1-7B \
+    --base_model_path path/to/Mistral-7b-v0.1-float16 \
     --save_path /path/to/save/task_vector_wildmarcoroni
 ```
 
@@ -42,8 +52,8 @@ python extract_task_vector_7b.py \
 
 ```bash
 python extract_task_vector_7b.py \
-    --finetuned_model_path PetroGPT/WestSeverus-7B-DPO-v2 \
-    --base_model_path Mistral-7b-v0.1 \
+    --finetuned_model_path path/to/PetroGPT/WestSeverus-7B-DPO-v2 \
+    --base_model_path path/to/Mistral-7b-v0.1-float16 \
     --save_path /path/to/save/task_vector_westseverus
 ```
 
