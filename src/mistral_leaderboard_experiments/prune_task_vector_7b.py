@@ -174,7 +174,7 @@ def main():
     parser.add_argument("--pruning_method", type=str, choices=["nm", "magnitude", "random"], default="nm", help="Pruning method to use")
     parser.add_argument("--n", type=int, default=64, help="Value of n for n:m pruning (required for 'nm' method)")
     parser.add_argument("--m", type=int, default=256, help="Value of m for n:m pruning (required for 'nm' method)")
-    parser.add_argument("--sparsity_level", type=float, default=0.5, help="Target sparsity level for magnitude or random pruning")
+    parser.add_argument("--sparsity_level", type=float, default=0.75, help="Target sparsity level for magnitude or random pruning")
     args = parser.parse_args()
 
     # Load base model
