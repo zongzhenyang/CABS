@@ -20,7 +20,7 @@ we utilized pre-trained and fine-tuned versions of the Mistral model, obtained f
 
 ## Files and Scripts
 
-- **convert_dtype.py**: Code  for convert model dtype
+- **convert_dtype.py**: Code for convert model dtype
 - **extract_task_vector_7b.py**: Code for extracting task vectors from the fine-tuned models by subtracting base model parameters.
 - **prune_task_vector_7b.py**: Code for applying different sparsification methods to the task vectors.
 - **/recipes**：recipes for merging models using Mergekit.
