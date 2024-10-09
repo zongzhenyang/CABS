@@ -64,7 +64,7 @@ python prune_task_vector.py \
 
 ### 3. Model Merging and Evaluation
 
-To merge and evaluate models with different hyperparameter ranges, use the following command:
+To merge and evaluate models with different lambdas ranges, use the following command:
 
 ```bash
 python main.py \
