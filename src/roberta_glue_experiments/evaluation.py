@@ -25,7 +25,7 @@ def evaluate_model_on_task(task, base_model_path, task_specific_paths, num_label
     
     # Load dataset and metrics
     raw_datasets = load_and_cache_data(task, tokenizer)
-    metric = evaluate.load('glue', 'sst2')  # Use evaluate.load to load the appropriate metric
+    metric = evaluate.load('glue', 'sst2') 
     
     # Set training arguments and initialize Trainer
     training_args = TrainingArguments(
