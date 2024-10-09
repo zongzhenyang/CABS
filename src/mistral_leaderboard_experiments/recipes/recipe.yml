@@ -8,4 +8,4 @@ models:
          
 merge_method: task_arithmetic
 dtype: float16
-base_model:  /path/to/model/Mistral-7b-v0.1
+base_model:  /path/to/model/Mistral-7b-v0.1-float16
