@@ -1,10 +1,10 @@
 models:
   - model: /path/to/WildMarcoroni-Variant1-7B-model-west-first-nm64_256/
     parameters:
-      weight: 0.6
+      weight: 1.2
   - model: /path/to/WestSeverus-7B-DPO-v2-model-west-first-nm64_256/
     parameters:
-      weight: 0.6
+      weight: 1.2
          
 merge_method: task_arithmetic
 dtype: float16
