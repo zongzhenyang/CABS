@@ -39,4 +39,4 @@ Detailed instructions for running the experiments are provided in each respectiv
 
 ## Open LLM Leaderboard Results
 
-On February 19, 2025, using the CABS framework, we obtained four merged models (versions **v0.1** through **v0.4** of *qwen2.5-7b-cabs*) that secured the top four positions among all models with 8B parameters or less on the Open LLM Leaderboard. View the leaderboard [here](https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard#/), and see the merged model details [here](https://huggingface.co/gz987/qwen2.5-7b-cabs-v0.3).
+On February 19, 2025, using the CABS framework, we obtained four merged models (versions **v0.1** through **v0.4** of *qwen2.5-7b-cabs*) that secured the top four positions among all models with 7B parameters or less on the Open LLM Leaderboard. View the leaderboard [here](https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard#/), and see the merged model details [here](https://huggingface.co/gz987/qwen2.5-7b-cabs-v0.3).
