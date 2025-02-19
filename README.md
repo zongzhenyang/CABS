@@ -36,3 +36,7 @@ The repository contains two types of experiments:
 2. **MIstral llm_leaderboard Experiments**: The experiments on the 7B parameter model are organized under the `src/mistral_leaderboard_experiments` directory. These experiments include using task vectors to perform model merging with MergeKit and evaluating with lm-evaluation-harness.
 
 Detailed instructions for running the experiments are provided in each respective directory.
+
+## Open LLM Leaderboard Results
+
+On February 19, 2025, using the CABS framework, we obtained four merged models (versions **v0.1** through **v0.4** of *qwen2.5-7b-cabs*) that secured the top four positions among all models with 8B parameters or less on the Open LLM Leaderboard. View the leaderboard [here](https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard#/), and see the merged model details [here](https://huggingface.co/gz987/qwen2.5-7b-cabs-v0.3).
