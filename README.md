@@ -2,6 +2,10 @@
 
 This repository contains the code for the submission "CABS: Conflict-Aware and Balanced Sparsification for Enhancing Model Merging".
 
+## Open LLM Leaderboard Results
+
+On February 19, 2025, using the CABS framework, we obtained four merged models (versions **v0.1** through **v0.4** of *qwen2.5-7b-cabs*) that secured the top four positions among all models with 8B parameters or less on the Open LLM Leaderboard. View the leaderboard [here](https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard#/), and see the merged model details [here](https://huggingface.co/gz987/qwen2.5-7b-cabs-v0.3).
+
 ## Abstract
 
 Model merging based on task vectors, i.e., the parameter differences between fine-tuned models and a shared base model, provides an efficient way to integrate multiple models without retraining. This approach can be used to combine task-specific models into a multitask model, improve generalization, or address model deficiencies. One of the significant challenges faced by model merging is the conflicts between task vectors. Existing works aim to mitigate these conflicts through sparsification; however, two issues observed in our experiments significantly limit their performance: *high parameter overlap* and *unbalanced weight distribution*.
@@ -37,6 +41,4 @@ The repository contains two types of experiments:
 
 Detailed instructions for running the experiments are provided in each respective directory.
 
-## Open LLM Leaderboard Results
 
-On February 19, 2025, using the CABS framework, we obtained four merged models (versions **v0.1** through **v0.4** of *qwen2.5-7b-cabs*) that secured the top four positions among all models with 8B parameters or less on the Open LLM Leaderboard. View the leaderboard [here](https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard#/), and see the merged model details [here](https://huggingface.co/gz987/qwen2.5-7b-cabs-v0.3).
